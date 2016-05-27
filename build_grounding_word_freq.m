@@ -1,0 +1,101 @@
+function build_grounding_word_freq(groundingtype, grounding)
+
+uselesswords = {'will', 'to', 'the', 'on', 'of', 'is', 'in', '''ll', 'be', 'a', 'at'};  
+matfilename = ['mats/' groundingtype '-' grounding '.mat'];
+R = load(matfilename);
+data = R.r;
+
+chunknamelist = {};
+for i = 1:length(data)
+    chunk = data{i};
+    chunkname = chunk{1};
+    for j = 1:length(chunkname)
+        chunknamelist{end+1} = chunkname{j};
+    end
+end
+chunknamelist = unique(chunknamelist);
+w = {};
+
+for n = 1:length(chunknamelist)
+    subdata = {};
+    for i = 1:length(data)
+        chunk = data{i};
+        if strcmp(chunk{1}, chunknamelist{n})
+            subdata{end+1} = chunk;
+        end
+    end
+    
+    wordlist = {};
+    fusionlist = {};
+    for i = 1:length(subdata)
+        chunk = subdata{i};
+        tag = chunk{2};
+        text = chunk{3};
+        for j = 1:length(text)
+            wordlist{end+1} = text{j};
+            fusionlist{end+1} = [tag{j} ' ' text{j}];
+        end
+    end
+
+    for i = 1:length(uselesswords)
+        idxset = find(strcmp(wordlist, uselesswords{i}));
+        wordlist(idxset) = [];
+        fusionlist(idxset) = [];
+    end
+
+    unifusion = unique(fusionlist);
+    subw = {};
+    for i = 1:length(unifusion)
+        t = 0;
+        for j = 1:length(subdata)
+            chunkunit = subdata{j};
+            tag = chunkunit{2};
+            text = chunkunit{3};
+            for k = 1:length(text)
+                if strcmp(unifusion{i}, [tag{k} ' ' text{k}])
+                    t = t + 1;
+                    break;
+                end
+            end
+        end
+    %     disp(uniword{i});
+    %     disp(t / length(wordlist));
+        cob = unifusion{i};
+        wtag = [];
+        wtext = [];
+        tt = 1;
+        iftag = 0;
+        while tt <= length(cob)
+            if iftag == 0
+                if cob(tt) == ' '
+                    iftag = 1;
+                else
+                    wtag = [wtag cob(tt)];
+                end
+            end
+            if iftag == 1
+                if cob(tt) ~= ' '
+                    wtext = [wtext cob(tt)];
+                end
+            end
+            tt = tt + 1;
+        end
+        wcell = {wtag, wtext, t / length(subdata)};
+        subw{end+1} = wcell;
+    end
+    w{end+1} = {chunknamelist{n}, subw};
+end
+
+for n = 1:length(chunknamelist)
+    subw = w{n};
+    disp([groundingtype '-' grounding]);
+    disp(subw{1});
+    subwsub = subw{2};
+    for m = 1:length(subwsub)
+        disp(subwsub{m});
+    end
+end
+
+save(['mats/' groundingtype, '-', grounding, '-wf'], 'w');
+
+end
