@@ -47,6 +47,46 @@ refdic = setdiff(unique(table(:,5)), 'N/A');
 dirdic = setdiff(unique(table(:,6)), 'N/A');
 tardic = setdiff(unique(table(:,7)), 'N/A');
 
+%%%% write to dic
+fileID = fopen(['vec/dic.txt'],'w');
+fprintf(fileID,'chunkdic:\n');
+for i = 1:length(chunkdic)
+    fprintf(fileID,'%s,', chunkdic{i});
+end
+fprintf(fileID, '\n');
+fprintf(fileID,'worddic:\n');
+for i = 1:length(worddic)
+    fprintf(fileID,'%s,', worddic{i});
+end
+fprintf(fileID, '\n');
+fprintf(fileID,'roomdic:\n');
+for i = 1:length(roomdic)
+    fprintf(fileID,'%s,', roomdic{i});
+end
+fprintf(fileID, '\n');
+fprintf(fileID,'objdic:\n');
+for i = 1:length(objdic)
+    fprintf(fileID,'%s,', objdic{i});
+end
+fprintf(fileID, '\n');
+fprintf(fileID,'refdic:\n');
+for i = 1:length(refdic)
+    fprintf(fileID,'%s,', refdic{i});
+end
+fprintf(fileID, '\n');
+fprintf(fileID,'dirdic:\n');
+for i = 1:length(dirdic)
+    fprintf(fileID,'%s,', dirdic{i});
+end
+fprintf(fileID, '\n');
+fprintf(fileID,'tardic:\n');
+for i = 1:length(tardic)
+    fprintf(fileID,'%s,', tardic{i});
+end
+fprintf(fileID, '\n');
+fclose(fileID);
+
+%%%% write to mat format data file
 data = {};
 for i = 1:size(table,1)
     numchunk = find(strcmp(chunkdic,chunks{i,1}));
